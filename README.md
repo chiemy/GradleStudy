@@ -192,11 +192,11 @@ defaultConfig {
 }
 ```
 
-在 gradle 被用来作为Android构建工具之前，AndroidManifest.xml 文件中的 package name 在有两个作用：1、app 的唯一标识，2、R 资源文件的包名(有时也是源码的包名)
+在 gradle 被用来作为 Android 构建工具之前，AndroidManifest.xml 文件中的 package name 有两个作用：1、app 的唯一标识，2、R 资源文件的包名(有时也是源码的包名)
 
 为了方便的构建不同版本的应用，Android 开发团队将 package name 的两大功能拆分开，AndroidManifest 文件中定义的 package name 依然被用来作为包名和 R 文件的包名。而 applicationid 将被用在设备和各大应用商店中作为唯一的标示。
 
-`minSdkVersion`、`targetSdkVersion`、`versionCode`、`versionName` 将会覆盖 AndroidManifest 中的相应信息，所以没必要在AndroidManifest中定义这些属性了。
+`minSdkVersion`、`targetSdkVersion`、`versionCode`、`versionName` 将会覆盖 AndroidManifest 中的相应信息，所以没必要在 AndroidManifest 中定义这些属性了。
 
 #### signingConfigs{} 签名配置
 
@@ -211,6 +211,8 @@ signingConfigs {
 }
 ```
 
+签名文件配置，将在 `buildTypes` 中用到。`release{}`，是用于正式版签名的配置，我们可以以配置名 + {}的形式，添加其他自定义的配置。
+
 **storeFile** 签名文件保存路径，这里使用的是相对路径，可以是绝对路径。
 
 **storePassword** 签名文件密码
@@ -218,8 +220,6 @@ signingConfigs {
 **keyAlias** 签名key别名
 
 **keyPassword** key密码
-
-签名文件配置，将在 `buildTypes` 中用到。
 
 
 #### buildTypes 构建类型
@@ -331,7 +331,7 @@ buildTypes {
 
 会在`defaultConfig`的`applicationId`的基础上加上一个后缀，这个对不同版本在手机上的共存很有用处。
 
-如上边的 debug 类型里，我添加了 「.debug」 的后缀，那么我在调试时，手机上的软件包名为 `com.chiemy.example.gradlestudy`，对我安装的正式版应用并不会产生影响，两个版本可以共存。
+如上边的 debug 类型里，我添加了 「.debug」 的后缀，那么我在调试时，手机上的软件包名为 `com.chiemy.example.gradlestudy.debug`，对我安装的正式版应用并不会产生影响，两个版本可以共存。
 
 **versionNameSuffix** 
 
@@ -357,13 +357,13 @@ buildConfigField "字段类型", "字段名称", "字段值"
 
 配置此属性后，会在相应的 module 下的 `build/generated/source/buildConfig/构建变种名（buildType + buildFlavor）/包名/BuildConfig` 文件内生成相应的属性。
 
+> 注：构建变种（Build Varients） = Build Type + Build Flavor，将在介绍 `productFlavors` 之后说明。
+
 我们对 `BuildConfig` 这个文件并不陌生，经常用到的就是 `BuildConfig.DEBUG` 属性了。以前只知道不要手动去修改此文件，现在知道如何添加属性了。
 
-还有一种应用场景，就是想我配置文件里写的，接口地址，可以根据不同的版本进行配置，想想之前的做法简直太low。
+还有一种应用场景，就是像我配置文件里写的，接口地址可以根据不同的版本进行配置，想想之前的做法简直太low。
 
 其他的应用场景，就自己来发挥想象了。
-
-> 注：构建变种（Build Varients） = Build Type + Build Flavor，将在介绍 `productFlavors` 之后说明。
 
 `BuildConfig` 也受到其他属性的一些影响，以 debug 的 BuildConfig 文件为例，我们看下：
 
@@ -392,14 +392,14 @@ android {
 ```
 该文件夹不会自动为你创建，所有你需要手工创建。在这里我们可以像 `main` 文件夹一样，创建 `java`， `res` 文件夹，`AndroidManifest。xml` 文件。将通过以下方式被使用：
 
-- manifest将被合并进main下的manifest中
-- 代码就像另一个资源文件夹一样
-- 资源文件将叠加到main的资源中，并替换已存在的资源。
+- manifest 将被合并进 main 下的 manifest 中
+- java 代码就像另一个源码文件夹一样
+- 资源文件将叠加到 main 的资源中，并替换已存在的资源。
 
 
 ### dependencies{}
 
-这个是 Gradle 的通用方法，不是 android 特有的，所以在了 android{} 外部。
+这个是 Gradle 的通用方法，不是 android 特有的，所以放在了 android{} 外部。
 
 ```
 dependencies {
@@ -415,7 +415,7 @@ dependencies {
 
 在使用 gradle 的之前，我们必须手动管理依赖，首先下载 jar 文件，复制到项目中，然后引用他们。因为这些 jar 包通常没有版本号，我们还要记住他们的版本号，当需要更新的时候，我们再去下载，然后再替换，这一切都很麻烦。对了，我们还要把 jar 包连同项目一起发布到 git 上，要不你的同事还得再去手动下载。
 
-使用gradle之后这一切都太爽了，只需要做个依赖声明，依赖包会在你执行build构建的时候自动从远程仓库下载。当然 Gradle 会为你在本地保留缓存，所以一个特定版本的依赖包只需要下载一次。
+使用 gradle 之后这一切都太爽了，只需要做个依赖声明，依赖包会在你执行 build 构建的时候自动从远程仓库下载。当然 Gradle 会为你在本地保留缓存，所以一个特定版本的依赖包只需要下载一次。（特意说下，如果依赖包都已经下载完，并可运行了，我们最好将 gradle 设置为离线状态「 Preference > Build,Execution,Deployment > Build Tools > Gradle > 勾选 Offline work」，以加快下次构建的速度。在依赖有更新时，我们才取消离线。）
 
 Gradle 支持三种不同的仓库，分别是：Maven 和 Ivy 以及文件夹。
 
@@ -452,11 +452,11 @@ repositories {
 }
 ```
 
-Maven 和 Jcenter 仓库是很出名的两大仓库。我们没必要同时使用他们，在这里我建议你们使用 jcenter，jcenter 是 maven 中心库的一个分支，这样你可以任意去切换这两个仓库。当然 jcenter 也支持了 https，而 maven 仓库并没有。
+Maven 和 Jcenter 仓库是很出名的两大仓库。我们没必要同时使用他们，在这里建议使用 jcenter，jcenter 是 maven 中心库的一个分支，这样你可以任意去切换这两个仓库。当然 jcenter 也支持了 https，而 maven 仓库并没有。
 
 #### 远程非中央仓库
 
-有些组织，创建了一些有意思的插件或者 library,他们更愿意把这些放在自己的 maven 库，而不是 maven 中心库或 jcenter。那么当你需要是要这些仓库的时候，你只需要在 maven 方法中加入 url 地址就好：
+有些组织，创建了一些有意思的插件或者 library，他们更愿意把这些放在自己的 maven 库，而不是 maven 中心库或 jcenter。那么当你需要是要这些仓库的时候，你只需要在 maven 方法中加入 url 地址就好：
 
 ```
 repositories {
