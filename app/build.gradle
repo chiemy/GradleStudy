@@ -1,0 +1,32 @@
+// google的Android开发团队编写的插件，能够提供所有关于Android应用和依赖库的构建，打包和测试。
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        applicationId "com.chiemy.example.gradlestudy"
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    // 配置文件在, 项目根目录下的 dependency.gradle 文件夹内, 在根目录下的 build.gradle 通过apply from:引入
+    // 这种方式在有多个module时非常有用, 避免修改依赖时, 需要修改多个module的问题
+    compile rootProject.ext.libSupportAppcompat;
+
+    // compile rootProject.ext.dependencies.appcompatV7
+    compile 'com.android.support:recyclerview-v7:+'
+}

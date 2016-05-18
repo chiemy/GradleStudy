@@ -1,0 +1,27 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+apply from: "dependency.gradle"
+buildscript {
+    repositories {
+        // 仓库使用jCenter, 不需要任何额外的配置
+        jcenter()
+    }
+    dependencies {
+        // 从jCenter中下载gradle插件
+        classpath 'com.android.tools.build:gradle:2.1.0'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+        // 注意: 不要讲你应用的依赖放在这里; 他们属于单独的module build.gradle文件
+    }
+}
+
+// 以用来定义各个模块的默认属性，你可以不仅仅局限于默认的配置，未来你可以在方法体内自己创造tasks，这些tasks将会在所有模块中可见。
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

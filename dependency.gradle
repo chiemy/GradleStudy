@@ -1,0 +1,12 @@
+
+def supportLibVersion = "23.4.0"
+
+ext{
+    libSupportAppcompat = "com.android.support:appcompat-v7:${supportLibVersion}"
+
+    // 下面这种方式也可以, 类似键值对的形式
+    // 使用这种方式引用, compile rootProject.ext.dependencies.appcompatV7
+//    dependencies = [
+//            appcompatV7 : "com.android.support:appcompat-v7:${supportLibVersion}",
+//    ]
+}
