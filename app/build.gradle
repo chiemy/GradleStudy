@@ -12,21 +12,51 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        release {
+            storeFile file("chiemy.jks")
+            storePassword "chiemy1989"
+            keyAlias "chiemytest"
+            keyPassword "chiemy1989"
+        }
+    }
+
     buildTypes {
         release {
+            // 是否优化/混淆
             minifyEnabled false
+            // 混淆文件规则文件名
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+
+            buildConfigField "String", "API_URL", "\"http://release.example.com/api\""
         }
+
+        debug {
+            // debug 版包名以.debug结尾, 这样我们的手机上正式版和测试版就可以共存了
+            applicationIdSuffix ".debug"
+            versionNameSuffix "_debug"
+            signingConfig signingConfigs.release
+            buildConfigField "String", "API_URL", "\"http://debug.example.com/api\""
+            resValue "String", "app_name", "Example DEBUG"
+        }
+S
+        custom1 {
+            applicationIdSuffix ".custom1"
+        }
+    }
+
+    productFlavors{
+
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     // 配置文件在, 项目根目录下的 dependency.gradle 文件夹内, 在根目录下的 build.gradle 通过apply from:引入
     // 这种方式在有多个module时非常有用, 避免修改依赖时, 需要修改多个module的问题
-    compile rootProject.ext.libSupportAppcompat;
-
+    compile rootProject.ext.libSupportAppcompat
     // compile rootProject.ext.dependencies.appcompatV7
-    compile 'com.android.support:recyclerview-v7:+'
 }

@@ -198,9 +198,208 @@ defaultConfig {
 
 `minSdkVersion`、`targetSdkVersion`、`versionCode`、`versionName` 将会覆盖 AndroidManifest 中的相应信息，所以没必要在AndroidManifest中定义这些属性了。
 
+#### signingConfigs{} 签名配置
+
+```
+signingConfigs {
+	release {
+		storeFile file("chiemy.jks")
+		storePassword "chiemy1989"
+		keyAlias "chiemytest"
+		keyPassword "chiemy1989"
+	}
+}
+```
+
+**storeFile** 签名文件保存路径，这里使用的是相对路径，可以是绝对路径。
+
+**storePassword** 签名文件密码
+
+**keyAlias** 签名key别名
+
+**keyPassword** key密码
+
+签名文件配置，将在 `buildTypes` 中用到。
+
+
+#### buildTypes 构建类型
+
+```
+buildTypes {
+	release {
+		// 是否优化/混淆
+		minifyEnabled false
+		// 混淆文件规则文件名
+		proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		buildConfigField "String", "API_URL", "\"http://release.example.com/api\""
+		signingConfig signingConfigs.release
+	}
+
+	debug {
+		// debug 版包名以.debug结尾, 这样我们的手机上正式版和测试版就可以共存了
+		applicationIdSuffix ".debug"
+		versionNameSuffix "_debug"
+		signingConfig signingConfigs.release
+		buildConfigField "String", "API_URL", "\"http://debug.example.com/api\""
+	}
+	
+	custom1 {
+		applicationIdSuffix ".custom1"
+		versionNameSuffix ""
+	}
+}
+```
+
+**release{}** 正式版的构建配置
+
+**debug{}** debug版构建配置，如果不添加的话，Android Studio也会默认有一个debug的类型。
+
+**custom{}** 这个是自定义的构建类型，名称可以随意。还可以添加更多
+
+
+下表是可能用到的一些属性，及其默认值
+
+<table>
+<thead>
+<tr>
+<th>Property name</th>
+<th style="text-align:center">debug 版默认值</th>
+<th style="text-align:right">release 或其他版本默认值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> <code>debuggable</code></td>
+<td style="text-align:center">true</td>
+<td style="text-align:right">false</td>
+</tr>
+<tr>
+<td> <code>jniDebugBuild</code></td>
+<td style="text-align:center">false</td>
+<td style="text-align:right">false</td>
+</tr>
+<tr>
+<td> <code>renderscriptDebugBuild</code></td>
+<td style="text-align:center">false</td>
+<td style="text-align:right">false</td>
+</tr>
+<tr>
+<td> <code>renderscriptOptimLevel</code></td>
+<td style="text-align:center">3</td>
+<td style="text-align:right">3</td>
+</tr>
+<tr>
+<td> <code>applicationIdSuffix</code></td>
+<td style="text-align:center">null</td>
+<td style="text-align:right">null</td>
+</tr>
+<tr>
+<td> <code>versionNameSuffix</code></td>
+<td style="text-align:center">null</td>
+<td style="text-align:right">null</td>
+</tr>
+<tr>
+<td> <code>signingConfig</code></td>
+<td style="text-align:center">android.signingConfigs.debug</td>
+<td style="text-align:right">null</td>
+</tr>
+<tr>
+<td> <code>zipAlign</code></td>
+<td style="text-align:center">false</td>
+<td style="text-align:right">true</td>
+</tr>
+<tr>
+<td> <code>runProguard</code></td>
+<td style="text-align:center">false</td>
+<td style="text-align:right">false</td>
+</tr>
+<tr>
+<td> <code>proguardFile</code></td>
+<td style="text-align:center">N/A (set only)</td>
+<td style="text-align:right">N/A (set only)</td>
+</tr>
+<tr>
+<td> <code>proguardFiles</code></td>
+<td style="text-align:center">N/A (set only)</td>
+<td style="text-align:right">N/A (set only)</td>
+</tr>
+</tbody>
+</table>
+
+
+**applicationIdSuffix** 
+
+会在`defaultConfig`的`applicationId`的基础上加上一个后缀，这个对不同版本在手机上的共存很有用处。
+
+如上边的 debug 类型里，我添加了 「.debug」 的后缀，那么我在调试时，手机上的软件包名为 `com.chiemy.example.gradlestudy`，对我安装的正式版应用并不会产生影响，两个版本可以共存。
+
+**versionNameSuffix** 
+
+为`versionName`添加后缀。
+
+**signingConfig** 
+
+签名配置，当进行构建时，会按照此配置进行签名。
+
+如果 debug 不配置 signingConfig 的话，也会使用一个默认的签名配置文件，这个文件位于 `$HOME/.android/debug.keystore` 目录下，如果不存在的话，在构建时会自动创建。
+
+在配置文件中，我们的 debug 类型和 release 类型用了同一个签名配置，这对于调试一些必须使用正式签名才能正常运行的第三方SDK（如百度地图 SDK ）来说很有用处。
+
+当然，我们可能不希望把签名密码暴露出来，我们可以采用如下方式 > [Stack Overflow post](http://stackoverflow.com/questions/18328730/how-to-create-a-release-signed-apk-file-using-gradle)
+
+**buildConfigField** 
+
+在配置中，我们还用到了这个属性。格式如下
+
+```
+buildConfigField "字段类型", "字段名称", "字段值"
+```
+
+配置此属性后，会在相应的 module 下的 `build/generated/source/buildConfig/构建变种名（buildType + buildFlavor）/包名/BuildConfig` 文件内生成相应的属性。
+
+我们对 `BuildConfig` 这个文件并不陌生，经常用到的就是 `BuildConfig.DEBUG` 属性了。以前只知道不要手动去修改此文件，现在知道如何添加属性了。
+
+还有一种应用场景，就是想我配置文件里写的，接口地址，可以根据不同的版本进行配置，想想之前的做法简直太low。
+
+其他的应用场景，就自己来发挥想象了。
+
+> 注：构建变种（Build Varients） = Build Type + Build Flavor，将在介绍 `productFlavors` 之后说明。
+
+`BuildConfig` 也受到其他属性的一些影响，以 debug 的 BuildConfig 文件为例，我们看下：
+
+```
+public final class BuildConfig {
+  // 可通过 debuggable 属性修改
+  public static final boolean DEBUG = Boolean.parseBoolean("true");
+  // applicationId + applicationIdSuffix
+  public static final String APPLICATION_ID = "com.chiemy.example.gradlestudy.debug";
+  public static final String BUILD_TYPE = "debug";
+  public static final String FLAVOR = "";
+  public static final int VERSION_CODE = 1;
+  // versionName + versionNameSuffix
+  public static final String VERSION_NAME = "1.0_debug";
+  // Fields from build type: debug
+  public static final String API_URL = "http://debug.example.com/api";
+}
+```
+
+除了以上属性之外，Build Type 还会受项目源码和资源影响： 对于每一个 Build Type 都会自动创建一个匹配的sourceSet。默认的路径为：`src/<buildtypename>/`，此路径可以被修改。
+
+```
+android {
+    sourceSets.buildtypename.setRoot('路径')
+}
+```
+该文件夹不会自动为你创建，所有你需要手工创建。在这里我们可以像 `main` 文件夹一样，创建 `java`， `res` 文件夹，`AndroidManifest。xml` 文件。将通过以下方式被使用：
+
+- manifest将被合并进main下的manifest中
+- 代码就像另一个资源文件夹一样
+- 资源文件将叠加到main的资源中，并替换已存在的资源。
+
+
 ### dependencies{}
 
-这个是 Gradle 的通过方法，不是 android 特有的，所以在了 android{} 外部。
+这个是 Gradle 的通用方法，不是 android 特有的，所以在了 android{} 外部。
 
 ```
 dependencies {
@@ -341,8 +540,30 @@ compile 'com.android.support:appcompat-v7:23.+'
 
 > 文章链接：[如何使用动态版本](https://brock.io/post/repeatable_android_builds/)
 
-Android Studio也是不建议使用动态版本的，如果使用了动态版本，会出现如下警告：
+Android Studio 也是不建议使用动态版本的，如果使用了动态版本，会出现如下警告：
 
 <image src="capture/capture03.webp" width=600>
 
-#### 使用Android Studio工具添加依赖库
+#### 使用 Android Studio 工具添加依赖库
+
+除了手动添加外，我们可以使用 Android Studio 工具添加依赖，在项目上点击右键 > Open Module Setting > 点击相应的 module > 点击 「Dependencies」 标签
+
+<image src="capture/capture01.webp" width=600>
+
+
+点击下方的加号，出现以下选项：
+
+<image src="capture/capture02.webp" width=200>
+
+**Library dependency**
+
+这个是添加 maven 仓库远程依赖，我们可以根据关键字在线搜索，添加相应的依赖。
+
+<image src="capture/capture04.webp" width=600>
+
+**File dependency** 我们添加本地的jar包依赖
+
+**Module dependency** 添加 module 作为依赖
+
+通过以上方式，会自动生成相应的配置代码。
+
