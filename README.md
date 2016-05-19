@@ -1,4 +1,28 @@
-# 项目主要结构
+<link rel="stylesheet" href="http://yandex.st/highlightjs/6.2/styles/googlecode.min.css">
+ 
+<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+<script src="http://yandex.st/highlightjs/6.2/highlight.min.js"></script>
+ 
+<script>hljs.initHighlightingOnLoad();</script>
+<script type="text/javascript">
+ $(document).ready(function(){
+      $("h2,h3,h4,h5,h6").each(function(i,item){
+        var tag = $(item).get(0).localName;
+        $(item).attr("id","wow"+i);
+        $("#category").append('<a class="new'+tag+'" href="#wow'+i+'">'+$(this).text()+'</a></br>');
+        $(".newh2").css("margin-left",0);
+        $(".newh3").css("margin-left",20);
+        $(".newh4").css("margin-left",40);
+        $(".newh5").css("margin-left",60);
+        $(".newh6").css("margin-left",80);
+      });
+ });
+</script>
+<div id="category"></div>
+
+<br>
+
+# 项目目录结构
 
 ```
 Project
@@ -7,7 +31,7 @@ Project
    ├── gradle/wrapper/
    │    ├── gradle-wrapper.jar
    │    └── gradle-wrapper.properties
-   ├── build.gradle
+   ├── [root_build_gradle](#root_build_gradle)
    ├── settings.gradle
    ├── dependency.gradle
    └── app
@@ -22,11 +46,9 @@ Project
                    ├── drawable
                    ├── layout
                    └── etc.
- ```
+```
  
- <br>
- 
-# 目录分析
+
 
 ## Project/gradlew、gradlew.bat
 gradlew 是一个 shell 脚本文件，在 Mac 上运行。
@@ -50,7 +72,7 @@ distributionUrl=https\://services.gradle.org/distributions/gradle-2.10-all.zip
 这里声明了 gradle 的目录与下载路径以及当前项目使用的 gradle 版本，这些默认的路径我们一般不会更改的，这个文件里指明的 gradle 版本不对也是很多导包不成功的原因之一。
 
 
-## Project/build.gradle
+## <a name='root_build_gradle'>Project/build.gradle</a>
 
 ```
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
