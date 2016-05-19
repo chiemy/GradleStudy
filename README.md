@@ -1,63 +1,55 @@
-<link rel="stylesheet" href="http://yandex.st/highlightjs/6.2/styles/googlecode.min.css">
- 
-<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-<script src="http://yandex.st/highlightjs/6.2/highlight.min.js"></script>
- 
-<script>hljs.initHighlightingOnLoad();</script>
-<script type="text/javascript">
- $(document).ready(function(){
-      $("h2,h3,h4,h5,h6").each(function(i,item){
-        var tag = $(item).get(0).localName;
-        $(item).attr("id","wow"+i);
-        $("#category").append('<a class="new'+tag+'" href="#wow'+i+'">'+$(this).text()+'</a></br>');
-        $(".newh2").css("margin-left",0);
-        $(".newh3").css("margin-left",20);
-        $(".newh4").css("margin-left",40);
-        $(".newh5").css("margin-left",60);
-        $(".newh6").css("margin-left",80);
-      });
- });
-</script>
-<div id="category"></div>
 
-<br>
 
-# 项目目录结构
+# 目录结构
 
-```
+
 Project
-   ├── gradlew
-   ├── gradlew.bat
+
+   ├── [gradlew](#gradlew)
+   
+   ├── [gradlew.bat](#gradlew)
+   
    ├── gradle/wrapper/
-   │    ├── gradle-wrapper.jar
-   │    └── gradle-wrapper.properties
-   ├── [root_build_gradle](#root_build_gradle)
-   ├── settings.gradle
-   ├── dependency.gradle
+   
+   │    　　　　　├── gradle-wrapper.jar
+   
+   │    　　　　　└── [gradle-wrapper.properties](#wrapper_pro)
+   
+   ├── [build.gradle](#root_build_gradle)
+   
+   ├── [settings.gradle](#setting_gradle)
+   
+   ├── [dependency.gradle](#dependency)
+      
    └── app
-       ├── build.gradle
-       ├── build
-       ├── libs
-       └── src
-           └── main
-               ├── java
-               │   └── com.package.myapp
-               └── res
-                   ├── drawable
-                   ├── layout
-                   └── etc.
-```
+   
+　　　　├── [build.gradle](#app_gradle)
+
+　　　　├── build
+
+　　　　├── libs
+
+　　　　└── src
+
+　　　　　　　└── main
+           
+　　　　　　　　　　├── java
+
+
+　　　　　　　　　　└── res
+
+
  
 
 
-## Project/gradlew、gradlew.bat
+## <a name='gradlew'>Project/gradlew、gradlew.bat</a>
 gradlew 是一个 shell 脚本文件，在 Mac 上运行。
 
 gradlew.bat，在 windows 系统上运行。
 
 当运行这些脚本时，对应于 gradle-wrapper.properties 文件内的 gradle 版本将会自动下载。
 
-## Project/gradle/wrapper/gradle-wrapper.properties
+## <a name='wrapper_pro'>Project/gradle/wrapper/gradle-wrapper.properties</a>
 
 ```
 #Mon Dec 28 10:00:20 PST 2015
@@ -107,7 +99,7 @@ task clean(type: Delete) {
 ```
 
 
-## Project/settings.gradle
+## <a name='setting_gradle'>Project/settings.gradle
 
 ```
 include ':app'
@@ -119,7 +111,7 @@ include ':app'
 include ':app', ‘:module1’, ':module2'
 ```
 
-## Project/dependency.gradle
+## <a name='dependency'>Project/dependency.gradle</a>
 
 ```
 // 声明了一个字符串
@@ -138,7 +130,7 @@ ext{
 
 这个不是项目生产的，是自行添加的，名称可随意，也可以不要后缀，这个后缀只是方便说明一个 gradle 相关的文件。此文件需要被引入，否则内容是使用不了的。在 `Project/build.gradle` 文件中，我们通过 `apply from: "dependency.gradle"` 进行了引入，看上文。
 
-## Project/app/build.gradle
+## <a name='app_gradle'>Project/app/build.gradle</a>
 
 ```
 apply plugin: 'com.android.application'
