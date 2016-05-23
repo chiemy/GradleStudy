@@ -1,0 +1,16 @@
+apply plugin: 'com.android.application'
+
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+}
+
+android {
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def fileName = "chiemy_${variant.versionName}_${variant.buildType.name}_${releaseTime()}.apk";
+            output.outputFile = new File(
+                    output.outputFile.parent, fileName
+            )
+        }
+    }
+}

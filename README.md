@@ -132,11 +132,12 @@ ext{
 
 ## <a name='app_gradle'>Project/app/build.gradle</a>
 
+
 ```
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
+   compileSdkVersion 23
     buildToolsVersion "23.0.3"
 
     defaultConfig {
@@ -146,11 +147,40 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        release {
+            storeFile file("chiemy.jks")
+            storePassword "chiemy1989"
+            keyAlias "chiemytest"
+            keyPassword "chiemy1989"
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+            shrinkResources true
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            buildConfigField "String", "API_URL", "\"http://release.example.com/api\""
         }
+
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "_debug"
+            signingConfig signingConfigs.release
+            buildConfigField "String", "API_URL", "\"http://debug.example.com/api\""
+            resValue "String", "app_name", "Example DEBUG"
+        }
+
+        custom1 {
+            applicationIdSuffix ".custom1"
+        }
+    }
+
+    productFlavors{
+
     }
 }
 
@@ -162,6 +192,46 @@ dependencies {
     compile rootProject.ext.libSupportAppcompat;
 
     // compile rootProject.ext.dependencies.appcompatV7
+}
+```
+
+大致的结构是这样的
+
+```
+apply plugin: 、、、
+android {
+	compileSdkVersion 、、、
+    buildToolsVersion 、、、
+    // 默认配置信息
+	defaultConfig{
+		、、、
+	}
+	// 签名配置信息
+	signingConfigs{
+		// 名称 + {}为一个配置，可有多个
+		// 默认有一个名为debug的签名配置
+		configName{
+			、、、
+		}
+	}
+	// 构建类型
+	buildTypes{
+		// 构建类型名称 + {} 为一个构建类型，可有多个
+		// 默认有一个名为debug的配置
+		buildTypesName{
+		}
+		、、、
+	}
+	// 定制产品，一般用于多渠道
+	productFlavors{
+		// 定制名 + {} 为一个定制版，可有多个
+		flavorName{
+		}
+		、、、
+    }
+}
+// 依赖
+dependencies {
 }
 ```
 
@@ -177,7 +247,12 @@ apply plugin: 'com.android.application'
 
 > 注意：当你在开发一个依赖库，那么你应该用 'com.android.library'，并且你不能同时使用他们2个，这将导致构建失败，一个模块要么使用 Android application 或者 Android library 插件，而不是二者。
 
+下面详细说下各 `{}` 的作用及配置：
+
 ### android{}
+
+> 注：`android{}` 下的方法和属性，可以通过此链接查询 > [Android Plugin DSL Reference](http://google.github.io/android-gradle-dsl/current/index.html)
+
 引入 `com.android.application` 插件后，我们可以使用该插件定义好的属性和方法，`android{}`代表了一个类，内部包含了 Android 的方法和属性。
 
 ```
@@ -188,6 +263,7 @@ buildToolsVersion："23.0.3"
 ```
 
 构建工具包含了很多实用的命令行命令，例如 aapt,zipalign,dx 等。
+
 
 #### defaultConfig{}
 
@@ -236,40 +312,37 @@ signingConfigs {
 **keyPassword** key密码
 
 
-#### buildTypes 构建类型
+#### buildTypes{} 构建类型
 
 ```
 buildTypes {
-	release {
-		// 是否优化/混淆
-		minifyEnabled false
-		// 混淆文件规则文件名
-		proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-		buildConfigField "String", "API_URL", "\"http://release.example.com/api\""
-		signingConfig signingConfigs.release
-	}
+        release {
+            // 剔除无用资源, 这个是依赖代码混淆的, minifyEnabled也要设置为true
+            shrinkResources true
+            // 是否优化/混淆
+            minifyEnabled true
+            // 混淆文件规则文件, proguard-android.txt是默认的混淆设置(在Android SDK tools/proguard/ 文件夹下), proguard-rules.pro'是提供给我们添加混淆规则的
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            buildConfigField "String", "API_URL", "\"http://release.example.com/api\""
+        }
 
-	debug {
-		// debug 版包名以.debug结尾, 这样我们的手机上正式版和测试版就可以共存了
-		applicationIdSuffix ".debug"
-		versionNameSuffix "_debug"
-		signingConfig signingConfigs.release
-		buildConfigField "String", "API_URL", "\"http://debug.example.com/api\""
-	}
-	
-	custom1 {
-		applicationIdSuffix ".custom1"
-		versionNameSuffix ""
-	}
-}
+        debug {
+            // debug 版包名以.debug结尾, 这样我们的手机上正式版和测试版就可以共存了
+            applicationIdSuffix ".debug"
+            versionNameSuffix "_debug"
+            signingConfig signingConfigs.release
+            buildConfigField "String", "API_URL", "\"http://debug.example.com/api\""
+            resValue "string", "app_name", "Example DEBUG"
+        }
+
+		// 还可以定义更多其他的type，格式为 名称 + {} 的形式
+    }
 ```
 
 **release{}** 正式版的构建配置
 
 **debug{}** debug版构建配置，如果不添加的话，Android Studio也会默认有一个debug的类型。
-
-**custom{}** 这个是自定义的构建类型，名称可以随意。还可以添加更多
-
 
 下表是可能用到的一些属性，及其默认值
 
@@ -340,6 +413,19 @@ buildTypes {
 </tbody>
 </table>
 
+**minifyEnabled**
+
+是否剔除无用代码，混淆、优化代码。在你设置为 true 时，一定要明确哪些类、方法、属性不需要混淆，因为有些代码和第三方库中的代码是不能混淆的，需要添加混淆规则，否则会出现问题。有些第三方库在文档里有明确的混淆说明，这块一定要留意，更多详细内容见 [shrinkResources](#shrink) 下的链接。
+
+**proguardFiles**
+
+根据那些文件规则进行混淆, `proguard-android.txt` 是默认的混淆设置(在Android SDK tools/proguard/ 文件夹下), `proguard-rules.pro` 是提供给我们添加混淆规则的
+
+<a name='shrink'>**shrinkResources**</a>
+
+是否压缩资源（剔除无用的资源文件，除values外），这个要配合 `minifyEnabled` 使用，如果 `shrinkResources` 为 true，那么 `minifyEnabled` 也要为 true。
+
+> 关于代码优化、资源压缩，请参考此链接 [Shrink Your Code and Resources](https://developer.android.com/studio/build/shrink-code.html)
 
 **applicationIdSuffix** 
 
@@ -410,6 +496,55 @@ android {
 - java 代码就像另一个源码文件夹一样
 - 资源文件将叠加到 main 的资源中，并替换已存在的资源。
 
+
+#### productFlavors{} 产品定制
+
+```
+productFlavors{
+	chiemy{
+		// 替换manifest中的占位符UMENG_CHANNEL_VALUE 为 own
+		manifestPlaceholders= [UMENG_CHANNEL_VALUE : "own"]
+	}
+
+	market_360{
+		manifestPlaceholders= [UMENG_CHANNEL_VALUE : "360"]
+	}
+
+	wandoujia{
+		manifestPlaceholders= [UMENG_CHANNEL_VALUE : "wandoujia"]
+	}
+}
+```
+
+和构建版本不同，product flavors 用来为一个 app 创建不同版本。典型的例子是，一个app有付费和免费版。product flavors 极大简化了基于相同的代码构建不同版本的 app。
+
+> 注意：flavor 的命名不能与已存在的 Build Type 或者 androidTest 这个 sourceSet 有冲突。
+
+也许我们对 buildType 和 productFlavor 的区别还是有些模糊，我们什么时候用 buildType ？什么时候应该用 productFlavors ?
+
+从字面看，build type 关注的是build，是开发过程，开发的生命周期；Product flavors 关注的是 Product，最终产品该如何分发。
+
+如果版本的区别在于是内部使用（测试）还是外部使用（面向用户），那么使用 buildType。如果面向最终用户需要多个版本，那么你需要使用 product flavors。
+
+product flavors常见的应用场景：多渠道打包
+
+> build Type 和 product flavor 区别，见[Why are build types distinct from product flavors?](http://stackoverflow.com/questions/27905934/why-are-build-types-distinct-from-product-flavors)
+
+就像构建版本一样，product Flavors 也有自己的代码文件夹，名称为 `flavor名 + buildType`。此文件夹不会自动创建，如果 flavor 版本需要不同的代码，不同的资源，我们可以创建这个文件夹，把相应的代码和资源放到里边。
+
+如在我的项目里，我创建了一个 `chiemyRelease` 的文件夹，这个对应的就是 chiemy 这个 flavor 的 release 版本，我在这里添加了一个图标，这样在构建此版本时，此图标就会替换 main 相同文件夹下的图标，达到自定义版本图标的目的。
+
+#### Build Type + Product Flavor = Build Variant 构建变种
+
+每一种 Build Type 和 Product Flavor 的组合就是一个Build Variant（构建变种版本）。
+
+例如，在上面的 Flavor 声明例子中与默认的 debug 和 release 两个 Build Type 将会生成 6 个 Build Variant ：
+
+<image src="capture/capture05.webp" width=400>
+
+> 注：通过 Android Studio 左边栏下方的 Build Variants 可查看和切换 Build Variant。
+
+项目中如果没有定义flavor同样也会有Build Variant，只是使用的是默认的flavor和配置。default(默认)的flavor/config是没有名字的，所以生成的Build Variant列表看起来就跟Build Type列表一样。
 
 ### dependencies{}
 

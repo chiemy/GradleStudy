@@ -1,5 +1,6 @@
 // google的Android开发团队编写的插件，能够提供所有关于Android应用和依赖库的构建，打包和测试。
 apply plugin: 'com.android.application'
+apply from: 'build_name.gradle'
 
 android {
     compileSdkVersion 23
@@ -15,7 +16,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("chiemy.jks")
+            storeFile file("../chiemy.jks")
             storePassword "chiemy1989"
             keyAlias "chiemytest"
             keyPassword "chiemy1989"
@@ -24,13 +25,17 @@ android {
 
     buildTypes {
         release {
+            // 剔除无用资源, 这个是依赖代码混淆的, minifyEnabled也要设置为true
+            shrinkResources true
             // 是否优化/混淆
-            minifyEnabled false
-            // 混淆文件规则文件名
+            minifyEnabled true
+            // 混淆文件规则文件, proguard-android.txt是默认的混淆设置(在Android SDK tools/proguard/ 文件夹下), proguard-rules.pro'是提供给我们添加混淆规则的
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
-
             buildConfigField "String", "API_URL", "\"http://release.example.com/api\""
+            // 编译时动态替换资源
+            // 注意, 第一个参数是小写的 string
+            resValue "string", "app_name", "GradleStudy"
         }
 
         debug {
@@ -39,17 +44,31 @@ android {
             versionNameSuffix "_debug"
             signingConfig signingConfigs.release
             buildConfigField "String", "API_URL", "\"http://debug.example.com/api\""
-            resValue "String", "app_name", "Example DEBUG"
+            resValue "string", "app_name", "GradleStudy Debug"
         }
-S
-        custom1 {
-            applicationIdSuffix ".custom1"
-        }
+
+//        custom1 {
+//            applicationIdSuffix ".custom1"
+//        }
     }
 
     productFlavors{
+        chiemy{
+            // 替换manifest中的占位符UMENG_CHANNEL_VALUE 为 own
+            manifestPlaceholders= [UMENG_CHANNEL_VALUE : "own"]
+            minSdkVersion 15
 
+        }
+
+        market_360{
+            manifestPlaceholders= [UMENG_CHANNEL_VALUE : "360"]
+        }
+
+        wandoujia{
+            manifestPlaceholders= [UMENG_CHANNEL_VALUE : "wandoujia"]
+        }
     }
+
 }
 
 dependencies {
