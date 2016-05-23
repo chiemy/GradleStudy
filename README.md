@@ -680,7 +680,7 @@ compile 'com.android.support:appcompat-v7:23.+'
 
 
 ```
-compile 'com.android.support:appcompat-v7:23.+'
+compile 'com.android.support:appcompat-v7:23.4.+'
 ```
 
 > 关于上边这种版本命名方式，找到了一个相关的说明，[APR版本规则](http://apr.apache.org/versioning.html)：[APR(Apache Portable Runtime)](http://apr.apache.org/)使用三个整数来记录版本号：MAJOR.MINOR.PATCH。MAJOR 表示当前 APR 的主版本号，它的变化通常意味着 APR 的巨大的变化，比如体系结构的重新设计，API 的重新设计等等，而且这种变化通常会导致APR版本的向前不兼容。MINOR 称之为 APR 的次版本号，它通常只反映了一些较大的更改，比如 APR 的 API 的增加等等，但是这些更改并不影响与旧版本源代码和二进制代码之间的兼容性。PATCH 通常称之为补丁版本，通常情况下如果只是对 APR 函数的修改而不影响 API 接口的话都会导致 PATCH 的变化。
