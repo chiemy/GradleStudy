@@ -540,7 +540,7 @@ product flavors常见的应用场景：多渠道打包
 
 例如，在上面的 Flavor 声明例子中与默认的 debug 和 release 两个 Build Type 将会生成 6 个 Build Variant ：
 
-<image src="capture/capture05.webp" width=400>
+<image src="capture/capture06.webp" width=400>
 
 > 注：通过 Android Studio 左边栏下方的 Build Variants 可查看和切换 Build Variant。
 
